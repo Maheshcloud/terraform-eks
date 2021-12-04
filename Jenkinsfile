@@ -23,10 +23,10 @@ pipeline{
            }
        }
        
-       stage("terraform destroy"){
-           steps{
-               sh 'terraform destroy --auto-approve'
-           }
-       }
+       #stage("terraform destroy"){
+        #   steps{
+         #      sh 'terraform destroy --auto-approve'
+          # }
+       #}
    }
 }
