@@ -10,5 +10,6 @@ aws eks --region us-east-1 update-kubeconfig --name eks_cluster_demo
 ```
 
 export AWS_ACCESS_KEY_ID="value"
+
 export AWS_SECRET_ACCESS_KEY="value"
 
