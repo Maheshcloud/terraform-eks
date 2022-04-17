@@ -23,6 +23,18 @@ pipeline{
            }
        }
        
+       stage("update kube config"){
+           steps{
+               sh 'aws eks --region us-east-1 update-kubeconfig --name eks_cluster_demo'
+           }
+       }
+       
+       stage("install metrics server"){
+           steps{
+               sh 'git clone https://github.com/initsixcloud/metric-server.git')
+           }
+       }
+       
      /*  stage("terraform destroy"){
            steps{
               sh 'terraform destroy --auto-approve'
