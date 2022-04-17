@@ -32,6 +32,7 @@ pipeline{
        stage("install metrics server"){
            steps{
                sh 'git clone https://github.com/initsixcloud/metric-server.git')
+               sh 'kubectl create -f .'
            }
        }
        
