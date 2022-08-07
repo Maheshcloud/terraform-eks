@@ -3,6 +3,9 @@ pipeline{
     
     tools {
         terraform 'terraform-ins'
+        
+        /* add terraform plugin in jenkins
+        add terraform path and save it */
    }
    
    stages{
