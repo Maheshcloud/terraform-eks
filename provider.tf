@@ -2,8 +2,8 @@
 provider "aws" {
   
   region = var.AWS_REGION
-  shared_credentials_file = "/home/ubuntu/.aws/credentials"
-  profile = "testing"
+  access_key = var.ACCESS_KEY
+  secret_key = var.SECRET_KEY
   
 }
 data "aws_region" "current" {
