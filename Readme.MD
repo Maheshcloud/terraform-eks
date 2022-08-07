@@ -4,6 +4,7 @@ From command line enter aws configure and enter access_key_id and secret_access_
 
 If it doesn't work then add below lines in variable.tf file
 
+```sh
 variable "ACCESS_KEY" {
  default = "key"
   }
@@ -11,7 +12,7 @@ variable "ACCESS_KEY" {
 variable "SECRET_KEY" {
   default = "key"
 }
-
+```
 
 Note: Need to install awscli
 
