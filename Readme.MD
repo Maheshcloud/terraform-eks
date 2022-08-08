@@ -1,5 +1,7 @@
 Add the content of Dockerfile in the Jenkins pipeline job and save it
 
+Once, Jenkins is up and running, need to install terraform plugin, then navigate to manage jenkins >> Global Tool Configure >> provide the name of the terraform as terraform-ins and provide the path or else you can install terraform automatically
+
 From command line enter aws configure and enter access_key_id and secret_access_key
 
 If it doesn't work then add below lines in variable.tf file
