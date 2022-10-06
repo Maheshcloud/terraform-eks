@@ -42,13 +42,13 @@ Note: Make a note of VPC ID, VPC CIDR, GroupID. Also, get the subnet ID from the
 aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text
 ```
 
-Setup a namespace
+## Setup a namespace
 
 ```sh
 kubectl create ns jenkins
 ```
 
-Setup our storage for Jenkins
+## Setup our storage for Jenkins
 
 ```sh
 kubectl get storageclass
@@ -62,7 +62,7 @@ kubectl apply -n jenkins -f jenkins.pvc.yml
 kubectl -n jenkins get pvc
 ```
 
-Deploy Jenkins
+## Deploy Jenkins
 
 ```sh
 # rbac
@@ -145,6 +145,19 @@ After installing kubernetes-plugin for Jenkins
 * Save
 
 # Test a build
+To run docker commands inside a jenkins agent you will need a custom jenkins agent with docker-in-docker working. Take a look and build the docker file in ./dockerfiles/jenkins-agent Push it to a registry and use it instead of above configured * Docker Image: jenkins/jnlp-slave If you do not use the custom image, the below pipeline will not work because default * Docker Image: jenkins/jnlp-slave public image does not have docker ability.
+
+Add a Jenkins Pipeline
+```sh
+node('jenkins-slave') {
+    
+     stage('unit-tests') {
+        sh(script: """
+            docker run --rm alpine /bin/sh -c "echo hello world"
+        """)
+    }
+}
+```
 
 ## Try a pipeline
 ```sh
