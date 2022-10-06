@@ -14,9 +14,9 @@ export AWS_ACCESS_KEY_ID="value"
 export AWS_SECRET_ACCESS_KEY="value"
 
 
-##Jenkins on Amazon Kubernetes
+## Jenkins on Amazon Kubernetes
 
-###Setup Cloud Storage
+### Setup Cloud Storage
 
 ```sh
 # deploy EFS storage driver
