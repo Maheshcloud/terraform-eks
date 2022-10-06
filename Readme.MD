@@ -106,7 +106,7 @@ docker build . -t mahesh.cloud84/jenkins-slave
 ## Continue Jenkins setup
 
 Install Kubernetes Plugin
-Configure Plugin: Values I used are here
+Configure Plugin: Values I used are below:
 
 Install Kubernetes Plugin
 
