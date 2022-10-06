@@ -66,9 +66,9 @@ Deploy Jenkins
 
 ```sh
 # rbac
-kubectl apply -n jenkins -f jenkins.rbac.yaml 
+kubectl apply -n jenkins -f jenkins.rbac.yml 
 
-kubectl apply -n jenkins -f jenkins.deployment.yaml
+kubectl apply -n jenkins -f jenkins.deployment.yml
 
 kubectl -n jenkins get pods
 ```
