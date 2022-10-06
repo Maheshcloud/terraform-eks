@@ -72,3 +72,144 @@ kubectl apply -n jenkins -f jenkins.deployment.yml
 
 kubectl -n jenkins get pods
 ```
+## Expose a service for agents
+```sh 
+kubectl apply -n jenkins -f jenkins.service.yaml 
+```
+
+## Jenkins Initial Setup
+
+```sh 
+kubectl -n jenkins exec -it <podname> cat /var/jenkins_home/secrets/initialAdminPassword
+kubectl port-forward -n jenkins <podname> 8080
+```
+
+## SSH to our node to get Docker user info
+```sh 
+eval $(ssh-agent)
+ssh-add ~/.ssh/id_rsa
+ssh -i ~/.ssh/id_rsa ec2-user@ec2-13-239-41-67.ap-southeast-2.compute.amazonaws.com
+id -u docker
+cat /etc/group
+# Get user ID for docker
+# Get group ID for docker
+```
+
+## Docker Jenkins Agent
+```sh
+# you can build it
+
+cd ./jenkins/
+docker build . -t mahesh.cloud84/jenkins-slave
+```
+
+## Continue Jenkins setup
+
+Install Kubernetes Plugin
+Configure Plugin: Values I used are here
+
+Install Kubernetes Plugin
+
+## Setting up Jenkins Agent
+
+After installing kubernetes-plugin for Jenkins
+
+* Go to Manage Jenkins | Bottom of Page | Cloud | Kubernetes (Add kubenretes cloud)
+* Fill out plugin values
+    * Name: kubernetes
+    * Kubernetes URL: https://kubernetes.default:443
+    * Kubernetes Namespace: jenkins
+    * Credentials | Add | Jenkins (Choose Kubernetes service account option & Global + Save)
+    * Test Connection | Should be successful! If not, check RBAC permissions and fix it!
+    * Jenkins URL: http://jenkins
+    * Tunnel : jenkins:50000
+    * Apply cap only on alive pods : yes!
+    * Add Kubernetes Pod Template
+       '''sh
+         Name: jenkins-slave
+         Namespace: jenkins
+         Service Account: jenkins
+         Labels: jenkins-slave (you will need to use this label on all jobs)
+         Containers | Add Template
+           Name: jnlp
+           Docker Image: aimvector/jenkins-slave
+           Command to run :
+           Arguments to pass to the command:
+           Allocate pseudo-TTY: yes
+           Add Volume
+              HostPath type
+              HostPath: /var/run/docker.sock
+              Mount Path: /var/run/docker.sock
+    * Timeout in seconds for Jenkins connection: 300
+
+* Save
+
+# Test a build
+
+## Try a pipeline
+```sh
+pipeline {
+    agent { 
+        kubernetes{
+            label 'jenkins-slave'
+        }
+        
+    }
+    environment{
+        DOCKER_USERNAME = credentials('DOCKER_USERNAME')
+        DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
+    }
+    stages {
+        stage('docker login') {
+            steps{
+                sh(script: """
+                    docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+                """, returnStdout: true) 
+            }
+        }
+
+        stage('git clone') {
+            steps{
+                sh(script: """
+                    git clone https://github.com/marcel-dempers/docker-development-youtube-series.git
+                """, returnStdout: true) 
+            }
+        }
+
+        stage('docker build') {
+            steps{
+                sh script: '''
+                #!/bin/bash
+                cd $WORKSPACE/docker-development-youtube-series/python
+                docker build . --network host -t aimvector/python:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('docker push') {
+            steps{
+                sh(script: """
+                    docker push aimvector/python:${BUILD_NUMBER}
+                """)
+            }
+        }
+
+        stage('deploy') {
+            steps{
+                sh script: '''
+                #!/bin/bash
+                cd $WORKSPACE/docker-development-youtube-series/
+                #get kubectl for this demo
+                curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+                chmod +x ./kubectl
+                ./kubectl apply -f ./kubernetes/configmaps/configmap.yaml
+                ./kubectl apply -f ./kubernetes/secrets/secret.yaml
+                cat ./kubernetes/deployments/deployment.yaml | sed s/1.0.0/${BUILD_NUMBER}/g | ./kubectl apply -f -
+                ./kubectl apply -f ./kubernetes/services/service.yaml
+                '''
+        }
+    }
+}
+}
+```
+
