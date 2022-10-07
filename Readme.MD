@@ -55,6 +55,8 @@ kubectl get storageclass
 
 # create volume
 kubectl apply -f jenkins.pv.yml 
+
+#Note: Update the jenkins.pv.yml with the filesystem ID under volumeHandle
 kubectl get pv
 
 # create volume claim
