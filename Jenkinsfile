@@ -14,6 +14,19 @@ pipeline{
                git branch: 'master', url: 'https://github.com/Maheshcloud/terraform-eks.git'
            }
        }
+       
+       stage("remove .terraform"){
+           steps{
+               script {
+                   try {
+                 sh 'rm -rf .terraform'
+            } catch (err) {
+                echo err.getMessage()
+            }
+               }
+              
+           }
+       }
        stage("terraform init"){
            steps{
                sh 'terraform init'
